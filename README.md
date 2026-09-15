@@ -10,9 +10,70 @@
 
 MCP for 小红书 / xiaohongshu.com。让你的 AI 助手直接访问小红书数据。
 
-> 本 fork（`retrieval-only` 分支）只注册 6 个检索工具：`check_login_status`、`get_login_qrcode`、
-> `delete_cookies`、`search_feeds`、`get_feed_detail`、`user_profile`。发布、评论、点赞、收藏、
-> 通知类工具不注册，接入 AI 客户端时不占上下文。镜像：`ghcr.io/hanepudding/xiaohongshu-mcp`。
+## 本 fork：只做检索
+
+`retrieval-only` 分支只注册 6 个工具：`check_login_status`、`get_login_qrcode`、`delete_cookies`、
+`search_feeds`、`get_feed_detail`、`user_profile`。发布、评论、点赞、收藏、通知类工具不注册，
+接入 AI 客户端时不占上下文。镜像：`ghcr.io/hanepudding/xiaohongshu-mcp:latest`，分支每次 push 自动构建。
+
+### 部署
+
+```yaml
+services:
+  xiaohongshu-mcp:
+    image: ghcr.io/hanepudding/xiaohongshu-mcp:latest
+    container_name: xiaohongshu-mcp
+    restart: unless-stopped
+    tty: true
+    environment:
+      - COOKIES_PATH=/app/data/cookies.json
+      - HOME=/app/data/home
+      - XDG_CONFIG_HOME=/app/data/config
+      # 海外手机号注册的账号加这一行；大陆手机号账号删掉。
+      # 这类账号的 web 端由 rednote.com 提供服务，在 xiaohongshu.com 上扫码
+      # 手机会显示成功，但网页会话永远是访客态。
+      - XHS_BASE_URL=https://www.rednote.com
+    volumes:
+      - ./data:/app/data   # cookies 和浏览器 profile；丢了就要重新扫码
+    ports:
+      - "18060:18060"
+```
+
+`docker compose up -d` 之后，让 AI 调用 `get_login_qrcode`，用小红书 App 扫码并在手机上点确认。
+cookie 有效期约一年，期间不用再扫；掉登录时 `search_feeds` 会返回「未登录」并提示重新扫码。
+
+### 接入客户端
+
+Claude Code（`~/.claude.json`）：
+
+```json
+"mcpServers": {
+  "xiaohongshu": { "type": "http", "url": "http://<容器所在主机>:18060/mcp" }
+}
+```
+
+Claude 桌面版只接受 stdio，用 `mcp-proxy` 桥接（`claude_desktop_config.json`；需要 [uv](https://docs.astral.sh/uv/)，
+`mcp<2` 是必须的，mcp-proxy 0.12 在 mcp 库 2.x 上无法启动）：
+
+```json
+"mcpServers": {
+  "xiaohongshu": {
+    "command": "uvx",
+    "args": ["--with", "mcp<2", "mcp-proxy", "--transport", "streamablehttp", "http://<容器所在主机>:18060/mcp"]
+  }
+}
+```
+
+### 与上游的差异
+
+- 搜索等待改为等结果注水（上游 PR #839），修 `search_feeds` 60 秒超时。
+- 登录判定在头像 selector 缺失时回退到页面 user 状态；扫码后确认页面为非访客态才保存 cookie。
+- `XHS_BASE_URL` 切换站点（与上游 PR #701 同名）；rednote 从 `/login` 页取二维码。
+- 未登录时 `search_feeds` / `get_feed_detail` 返回明确错误，工具描述写明扫码流程。
+
+以下为上游 README 原文。
+
+---
 
 ### 🚀 快速开始：选择最适合你的版本
 
