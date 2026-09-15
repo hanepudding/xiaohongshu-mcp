@@ -10,6 +10,10 @@
 
 MCP for 小红书 / xiaohongshu.com。让你的 AI 助手直接访问小红书数据。
 
+> 本 fork（`retrieval-only` 分支）只注册 6 个检索工具：`check_login_status`、`get_login_qrcode`、
+> `delete_cookies`、`search_feeds`、`get_feed_detail`、`user_profile`。发布、评论、点赞、收藏、
+> 通知类工具不注册，接入 AI 客户端时不占上下文。镜像：`ghcr.io/hanepudding/xiaohongshu-mcp`。
+
 ### 🚀 快速开始：选择最适合你的版本
 
 > [!IMPORTANT]

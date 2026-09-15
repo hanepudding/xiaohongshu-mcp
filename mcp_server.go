@@ -225,50 +225,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 		}),
 	)
 
-	// 工具 4: 发布内容
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "publish_content",
-			Description: "发布小红书图文内容",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Publish Content",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("publish_content", func(ctx context.Context, req *mcp.CallToolRequest, args PublishContentArgs) (*mcp.CallToolResult, any, error) {
-			// 转换参数格式到现有的 handler
-			argsMap := map[string]interface{}{
-				"title":       args.Title,
-				"content":     args.Content,
-				"images":      convertStringsToInterfaces(args.Images),
-				"tags":        convertStringsToInterfaces(args.Tags),
-				"schedule_at": args.ScheduleAt,
-				"is_original": args.IsOriginal,
-				"visibility":  args.Visibility,
-				"products":    convertStringsToInterfaces(args.Products),
-			}
-			result := appServer.handlePublishContent(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 5: 获取Feed列表
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "list_feeds",
-			Description: "获取首页 Feeds 列表",
-			Annotations: &mcp.ToolAnnotations{
-				Title:        "List Feeds",
-				ReadOnlyHint: true,
-			},
-		},
-		withPanicRecovery("list_feeds", func(ctx context.Context, req *mcp.CallToolRequest, _ any) (*mcp.CallToolResult, any, error) {
-			result := appServer.handleListFeeds(ctx)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 6: 搜索内容
+	// 工具 4: 搜索内容
 	mcp.AddTool(server,
 		&mcp.Tool{
 			Name:        "search_feeds",
@@ -284,7 +241,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 		}),
 	)
 
-	// 工具 7: 获取Feed详情
+	// 工具 5: 获取Feed详情
 	mcp.AddTool(server,
 		&mcp.Tool{
 			Name:        "get_feed_detail",
@@ -329,7 +286,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 		}),
 	)
 
-	// 工具 8: 获取用户主页
+	// 工具 6: 获取用户主页
 	mcp.AddTool(server,
 		&mcp.Tool{
 			Name:        "user_profile",
@@ -350,205 +307,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 		}),
 	)
 
-	// 工具 9: 发表评论
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "post_comment_to_feed",
-			Description: "发表评论到小红书笔记",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Post Comment",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("post_comment_to_feed", func(ctx context.Context, req *mcp.CallToolRequest, args PostCommentArgs) (*mcp.CallToolResult, any, error) {
-			argsMap := map[string]interface{}{
-				"feed_id":    args.FeedID,
-				"xsec_token": args.XsecToken,
-				"content":    args.Content,
-			}
-			result := appServer.handlePostComment(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 10: 回复评论
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "reply_comment_in_feed",
-			Description: "回复小红书笔记下的指定评论",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Reply Comment",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("reply_comment_in_feed", func(ctx context.Context, req *mcp.CallToolRequest, args ReplyCommentArgs) (*mcp.CallToolResult, any, error) {
-			if args.CommentID == "" && args.UserID == "" {
-				return &mcp.CallToolResult{
-					IsError: true,
-					Content: []mcp.Content{&mcp.TextContent{Text: "缺少 comment_id 或 user_id"}},
-				}, nil, nil
-			}
-
-			argsMap := map[string]interface{}{
-				"feed_id":    args.FeedID,
-				"xsec_token": args.XsecToken,
-				"comment_id": args.CommentID,
-				"user_id":    args.UserID,
-				"content":    args.Content,
-			}
-			result := appServer.handleReplyComment(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 11: 发布视频（仅本地文件）
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "publish_with_video",
-			Description: "发布小红书视频内容（仅支持本地单个视频文件）",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Publish Video",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("publish_with_video", func(ctx context.Context, req *mcp.CallToolRequest, args PublishVideoArgs) (*mcp.CallToolResult, any, error) {
-			argsMap := map[string]interface{}{
-				"title":       args.Title,
-				"content":     args.Content,
-				"video":       args.Video,
-				"tags":        convertStringsToInterfaces(args.Tags),
-				"schedule_at": args.ScheduleAt,
-				"visibility":  args.Visibility,
-				"products":    convertStringsToInterfaces(args.Products),
-			}
-			result := appServer.handlePublishVideo(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 12: 点赞笔记
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "like_feed",
-			Description: "为指定笔记点赞或取消点赞（如已点赞将跳过点赞，如未点赞将跳过取消点赞）",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Like Feed",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("like_feed", func(ctx context.Context, req *mcp.CallToolRequest, args LikeFeedArgs) (*mcp.CallToolResult, any, error) {
-			argsMap := map[string]interface{}{
-				"feed_id":    args.FeedID,
-				"xsec_token": args.XsecToken,
-				"unlike":     args.Unlike,
-			}
-			result := appServer.handleLikeFeed(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 13: 收藏笔记
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "favorite_feed",
-			Description: "收藏指定笔记或取消收藏（如已收藏将跳过收藏，如未收藏将跳过取消收藏）",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Favorite Feed",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("favorite_feed", func(ctx context.Context, req *mcp.CallToolRequest, args FavoriteFeedArgs) (*mcp.CallToolResult, any, error) {
-			argsMap := map[string]interface{}{
-				"feed_id":    args.FeedID,
-				"xsec_token": args.XsecToken,
-				"unfavorite": args.Unfavorite,
-			}
-			result := appServer.handleFavoriteFeed(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 14: 获取我的主页
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "get_my_profile",
-			Description: "获取当前登录用户的主页，返回用户基本信息，关注、粉丝、获赞量，以及指定 tab 下的内容。tab 可选 note(自己发的笔记,默认)、fav(自己收藏的)、liked(自己点赞的)",
-			Annotations: &mcp.ToolAnnotations{
-				Title:        "Get My Profile",
-				ReadOnlyHint: true,
-			},
-		},
-		withPanicRecovery("get_my_profile", func(ctx context.Context, req *mcp.CallToolRequest, args MyProfileArgs) (*mcp.CallToolResult, any, error) {
-			result := appServer.handleGetMyProfile(ctx, args.Tab)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 15: 通知未读数
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "get_unread_count",
-			Description: "获取通知未读数，返回「评论和@」「赞和收藏」「新增关注」三个分区各自的未读条数。不会清除未读标记。查看具体内容用 list_notifications。",
-			Annotations: &mcp.ToolAnnotations{
-				Title:        "Get Unread Count",
-				ReadOnlyHint: true,
-			},
-		},
-		withPanicRecovery("get_unread_count", func(ctx context.Context, req *mcp.CallToolRequest, _ any) (*mcp.CallToolResult, any, error) {
-			result := appServer.handleGetUnreadCount(ctx)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 16: 通知列表
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "list_notifications",
-			Description: "获取通知列表。返回评论内容、评论者、以及对应笔记的 feed_id 和 xsec_token（可用于 get_feed_detail 读原帖）。已删除或不可见的条目会被过滤，过滤数量见 filtered 字段。注意：会清除该分区的未读标记，只需要未读数时用 get_unread_count。",
-			Annotations: &mcp.ToolAnnotations{
-				Title:        "List Notifications",
-				ReadOnlyHint: true,
-			},
-		},
-		withPanicRecovery("list_notifications", func(ctx context.Context, req *mcp.CallToolRequest, args ListNotificationsArgs) (*mcp.CallToolResult, any, error) {
-			result := appServer.handleListNotifications(ctx, args.Tab, args.Limit)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 17: 回复通知里的评论
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "reply_notification",
-			Description: "回复「评论和@」里的一条评论。comment_id 从 list_notifications 获取。适合处理收到的评论，无需先定位笔记。",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Reply Notification",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("reply_notification", func(ctx context.Context, req *mcp.CallToolRequest, args ReplyNotificationArgs) (*mcp.CallToolResult, any, error) {
-			result := appServer.handleReplyNotification(ctx, args.CommentID, args.Content)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 18: 给通知里的评论点赞
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "like_notification",
-			Description: "给「评论和@」里的一条评论点赞或取消点赞。comment_id 从 list_notifications 获取（其 liked 字段是当前状态）。已是目标状态时跳过。",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Like Notification",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("like_notification", func(ctx context.Context, req *mcp.CallToolRequest, args LikeNotificationArgs) (*mcp.CallToolResult, any, error) {
-			result := appServer.handleLikeNotification(ctx, args.CommentID, args.Unlike)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	logrus.Infof("Registered %d MCP tools", 18)
+	logrus.Infof("Registered %d MCP tools", 6)
 }
 
 // convertToMCPResult 将自定义的 MCPToolResult 转换为官方 SDK 的格式
