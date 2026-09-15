@@ -13,6 +13,7 @@ import (
 	"github.com/xpzouying/xiaohongshu-mcp/browser"
 	"github.com/xpzouying/xiaohongshu-mcp/configs"
 	"github.com/xpzouying/xiaohongshu-mcp/cookies"
+	xhserrors "github.com/xpzouying/xiaohongshu-mcp/errors"
 	"github.com/xpzouying/xiaohongshu-mcp/pkg/downloader"
 	"github.com/xpzouying/xiaohongshu-mcp/pkg/xhsutil"
 	"github.com/xpzouying/xiaohongshu-mcp/xiaohongshu"
@@ -441,6 +442,13 @@ func (s *XiaohongshuService) SearchFeeds(ctx context.Context, keyword string, fi
 	if err != nil {
 		return nil, err
 	}
+	// A guest session gets the login modal instead of results, which reads
+	// as an empty search. Tell the caller the real reason.
+	if len(feeds) == 0 {
+		if _, uerr := xiaohongshu.NewLogin(page).CurrentUser(ctx); uerr != nil {
+			return nil, xhserrors.ErrNotLoggedIn
+		}
+	}
 
 	response := &FeedsListResponse{
 		Feeds: feeds,
@@ -467,6 +475,9 @@ func (s *XiaohongshuService) GetFeedDetailWithConfig(ctx context.Context, feedID
 
 	result, err := action.GetFeedDetailWithConfig(ctx, feedID, xsecToken, loadAllComments, config)
 	if err != nil {
+		if _, uerr := xiaohongshu.NewLogin(page).CurrentUser(ctx); uerr != nil {
+			return nil, xhserrors.ErrNotLoggedIn
+		}
 		return nil, err
 	}
 

@@ -197,7 +197,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 	mcp.AddTool(server,
 		&mcp.Tool{
 			Name:        "get_login_qrcode",
-			Description: "获取登录二维码（返回 Base64 图片和超时时间）",
+			Description: "获取登录二维码（返回图片和超时时间）。拿到后把图片展示给用户，请用户用小红书 App 扫码并在手机上点确认；之后用 check_login_status 确认已登录。",
 			Annotations: &mcp.ToolAnnotations{
 				Title:        "Get Login QR Code",
 				ReadOnlyHint: true,
@@ -229,7 +229,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 	mcp.AddTool(server,
 		&mcp.Tool{
 			Name:        "search_feeds",
-			Description: "搜索小红书内容（需要已登录）",
+			Description: "搜索小红书内容。需要已登录：返回「未登录」错误时，先调用 get_login_qrcode，把二维码图片展示给用户，等用户扫码并在手机上确认后再重试本次搜索。",
 			Annotations: &mcp.ToolAnnotations{
 				Title:        "Search Feeds",
 				ReadOnlyHint: true,
@@ -245,7 +245,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 	mcp.AddTool(server,
 		&mcp.Tool{
 			Name:        "get_feed_detail",
-			Description: "获取小红书笔记详情，返回笔记内容、图片、作者信息、互动数据（点赞/收藏/分享数）及评论列表。视频笔记额外返回 video 字段，含各编码档位的视频直链与字幕地址（均带签名、有时效）。默认返回前10条一级评论，如需更多评论请设置load_all_comments=true",
+			Description: "获取小红书笔记详情（需要已登录，未登录时按 search_feeds 的说明处理），返回笔记内容、图片、作者信息、互动数据（点赞/收藏/分享数）及评论列表。视频笔记额外返回 video 字段，含各编码档位的视频直链与字幕地址（均带签名、有时效）。默认返回前10条一级评论，如需更多评论请设置load_all_comments=true",
 			Annotations: &mcp.ToolAnnotations{
 				Title:        "Get Feed Detail",
 				ReadOnlyHint: true,
