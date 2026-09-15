@@ -222,7 +222,7 @@ func waitAuthenticated(ctx context.Context, loginAction *xiaohongshu.LoginAction
 
 		pp := page.Context(ctx)
 		if err := rod.Try(func() {
-			pp.MustNavigate("https://www.xiaohongshu.com/explore").MustWaitLoad()
+			pp.MustNavigate(xiaohongshu.BaseURL() + "/explore").MustWaitLoad()
 		}); err != nil {
 			return false
 		}
@@ -716,3 +716,4 @@ func (s *XiaohongshuService) GetMyProfile(ctx context.Context, tab string) (*Use
 
 	return response, nil
 }
+
