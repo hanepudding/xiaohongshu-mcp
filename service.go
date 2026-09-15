@@ -188,6 +188,13 @@ func (s *XiaohongshuService) waitScanInBackground(
 		defer s.logins.finish(seq)
 
 		if loginAction.WaitForLogin(ctxTimeout) {
+			// The avatar element can be present while the page still reports
+			// a guest user; cookies saved at that point are a guest session.
+			// Save only once the page's own user state is non-guest.
+			if !waitAuthenticated(ctxTimeout, loginAction, page) {
+				logrus.Warnf("检测到扫码但会话仍为访客态，未保存 cookies，会话 #%d", seq)
+				return
+			}
 			if err := saveCookies(page); err != nil {
 				logrus.Errorf("扫码成功但保存 cookies 失败，会话 #%d: %v", seq, err)
 				return
@@ -199,6 +206,38 @@ func (s *XiaohongshuService) waitScanInBackground(
 		// 没等到扫码：要么超时，要么被新取的二维码取代
 		logrus.Infof("登录会话 #%d 结束，未检测到扫码（超时或已被新的二维码取代）", seq)
 	}()
+}
+
+// waitAuthenticated re-navigates and polls the page's own user state until it
+// reports a non-guest user, so the authenticated web_session is in the cookie
+// store before we save it. Returns false if the session stays guest until the
+// context ends.
+func waitAuthenticated(ctx context.Context, loginAction *xiaohongshu.LoginAction, page *rod.Page) bool {
+	for {
+		select {
+		case <-ctx.Done():
+			return false
+		default:
+		}
+
+		pp := page.Context(ctx)
+		if err := rod.Try(func() {
+			pp.MustNavigate("https://www.xiaohongshu.com/explore").MustWaitLoad()
+		}); err != nil {
+			return false
+		}
+		time.Sleep(2 * time.Second)
+
+		if _, err := loginAction.CurrentUser(ctx); err == nil {
+			return true
+		}
+
+		select {
+		case <-ctx.Done():
+			return false
+		case <-time.After(2 * time.Second):
+		}
+	}
 }
 
 // PublishContent 发布内容
