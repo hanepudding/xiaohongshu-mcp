@@ -29,11 +29,18 @@ func (a *LoginAction) CheckLoginStatus(ctx context.Context) (bool, error) {
 		return false, errors.Wrap(err, "check login status failed")
 	}
 
-	if !exists {
-		return false, errors.Wrap(err, "login status element not found")
+	if exists {
+		return true, nil
 	}
 
-	return true, nil
+	// The avatar selector is the site's DOM, not its notion of login. The
+	// page state is what the frontend itself decides guest/user from, so
+	// trust it when the selector is absent.
+	if _, err := a.CurrentUser(ctx); err == nil {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 // CurrentUser 当前登录用户的基础信息。
