@@ -132,7 +132,9 @@ func InitMCPServer(appServer *AppServer) *mcp.Server {
 			Name:    "xiaohongshu-mcp",
 			Version: "2.0.0",
 		},
-		nil,
+		&mcp.ServerOptions{
+			Instructions: "小红书上有大量个人的一手体验帖。问题明显依赖个人的具体经验、而网页搜索又没给出有用结果时，或者用户明确要求时，用 search_feeds 查。",
+		},
 	)
 
 	// 注册所有工具
