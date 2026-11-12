@@ -98,7 +98,12 @@ func watchSearchResponses(page *rod.Page, keyword string) (<-chan searchResponse
 
 func isSearchNotesURL(raw string) bool {
 	u, err := url.Parse(raw)
-	if err != nil || !strings.HasSuffix(u.Hostname(), ".xiaohongshu.com") {
+	if err != nil {
+		return false
+	}
+	// 接口域名跟着站点走：edith.xiaohongshu.com，或 XHS_BASE_URL 为 rednote 时的 webapi.rednote.com。
+	base, err := url.Parse(getBaseURL())
+	if err != nil || !strings.HasSuffix(u.Hostname(), "."+strings.TrimPrefix(base.Hostname(), "www.")) {
 		return false
 	}
 	return u.Path == "/api/sns/web/v1/search/notes" || u.Path == "/api/sns/web/v2/search/notes"

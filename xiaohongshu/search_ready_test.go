@@ -60,6 +60,11 @@ func TestIsSearchNotesURL(t *testing.T) {
 	} {
 		require.False(t, isSearchNotesURL(raw), raw)
 	}
+
+	// XHS_BASE_URL 切到 rednote 后，只认 rednote 的接口域名。
+	t.Setenv("XHS_BASE_URL", "https://www.rednote.com")
+	require.True(t, isSearchNotesURL("https://webapi.rednote.com/api/sns/web/v1/search/notes"))
+	require.False(t, isSearchNotesURL("https://edith.xiaohongshu.com/api/sns/web/v1/search/notes"))
 }
 
 // TestIsTransientContextError 跳转期间执行上下文会短暂失效，这类错误应当重试；
