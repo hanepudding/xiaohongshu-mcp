@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -445,15 +446,18 @@ func (s *XiaohongshuService) SearchFeeds(ctx context.Context, keyword string, fi
 	action := xiaohongshu.NewSearchAction(page)
 
 	feeds, err := action.Search(ctx, keyword, filters...)
-	if err != nil {
+	// 安全验证页不是登录问题，原样返回。
+	if errors.Is(err, xhserrors.ErrVerificationRequired) {
 		return nil, err
 	}
-	// A guest session gets the login modal instead of results, which reads
-	// as an empty search. Tell the caller the real reason.
-	if len(feeds) == 0 {
+	// 未登录时页面弹登录框、不出结果：表现为等待超时或空结果，这里换成真正的原因。
+	if err != nil || len(feeds) == 0 {
 		if _, uerr := xiaohongshu.NewLogin(page).CurrentUser(ctx); uerr != nil {
 			return nil, xhserrors.ErrNotLoggedIn
 		}
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	response := &FeedsListResponse{
