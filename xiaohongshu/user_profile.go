@@ -54,8 +54,25 @@ func (u *UserProfileAction) UserProfile(ctx context.Context, userID, xsecToken s
 	page := u.page.Context(ctx).Timeout(60 * time.Second) // 重设被 .Context 清掉的 deadline
 
 	searchURL := makeUserProfileURL(userID, xsecToken, tab)
-	page.MustNavigate(searchURL)
-	page.MustWaitStable()
+	if err := page.Navigate(searchURL); err != nil {
+		return nil, err
+	}
+	// 不能用 WaitStable：主页的 APM 埋点请求偶尔永不结束，会把整个超时耗尽。
+	// 当前 tab 有笔记，或 hasMore=false（空 tab、不公开 tab），即视为就绪。
+	if err := page.Wait(rod.Eval(`() => {
+		const u = window.__INITIAL_STATE__ && window.__INITIAL_STATE__.user;
+		if (!u) return false;
+		// 字段可能是 ref，也可能被页面换成普通对象（userPageData 常见）
+		const unwrap = (o) => (o && o.value !== undefined) ? o.value : (o && o._value !== undefined ? o._value : o);
+		const notes = unwrap(u.notes);
+		const active = unwrap(u.activeTab);
+		const queries = unwrap(u.noteQueries);
+		if (!unwrap(u.userPageData) || !notes || !active) return false;
+		const i = active.index || 0;
+		return (notes[i] && notes[i].length > 0) || (queries && queries[i] && queries[i].hasMore === false);
+	}`)); err != nil {
+		return nil, fmt.Errorf("waiting for user %s profile data: %w", userID, err)
+	}
 
 	return u.extractUserProfileData(page, tab)
 }
@@ -69,7 +86,8 @@ func (u *UserProfileAction) extractUserProfileData(page *rod.Page, tab ProfileTa
 		    window.__INITIAL_STATE__.user &&
 		    window.__INITIAL_STATE__.user.userPageData) {
 			const userPageData = window.__INITIAL_STATE__.user.userPageData;
-			const data = userPageData.value !== undefined ? userPageData.value : userPageData._value;
+			const data = userPageData.value !== undefined ? userPageData.value :
+				(userPageData._value !== undefined ? userPageData._value : userPageData);
 			if (data) {
 				return JSON.stringify(data);
 			}
@@ -85,7 +103,7 @@ func (u *UserProfileAction) extractUserProfileData(page *rod.Page, tab ProfileTa
 	notesResult := page.MustEval(`() => {
 		const u = window.__INITIAL_STATE__ && window.__INITIAL_STATE__.user;
 		if (!u || !u.notes) return "";
-		const unwrap = (o) => (o && o.value !== undefined) ? o.value : (o && o._value);
+		const unwrap = (o) => (o && o.value !== undefined) ? o.value : (o && o._value !== undefined ? o._value : o);
 		const notes = unwrap(u.notes);
 		if (!notes) return "";
 		const active = unwrap(u.activeTab) || {};
