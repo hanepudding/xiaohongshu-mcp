@@ -1,11 +1,11 @@
 # xiaohongshu-mcp
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-29-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-41-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-[![Philanthropy](https://img.shields.io/badge/Philanthropy-CNY%201810.00-brightgreen?style=flat-square)](./DONATIONS.md)
-[![Gratitude](https://img.shields.io/badge/Gratitude-CNY%201524.64-blue?style=flat-square)](./DONATIONS.md)
+[![Philanthropy](https://img.shields.io/badge/Philanthropy-CNY%202010.00-brightgreen?style=flat-square)](./DONATIONS.md)
+[![Gratitude](https://img.shields.io/badge/Gratitude-CNY%201624.21-blue?style=flat-square)](./DONATIONS.md)
 [![Docker Pulls](https://img.shields.io/docker/pulls/xpzouying/xiaohongshu-mcp?style=flat-square&logo=docker)](https://hub.docker.com/r/xpzouying/xiaohongshu-mcp)
 
 MCP for RedNote (Xiaohongshu) / xiaohongshu.com. Give your AI assistant direct access to RedNote data.
@@ -383,66 +383,32 @@ go env -w  GOPROXY=https://goproxy.io,direct
 
 </details>
 
-**Method 3: Using Docker Container (Simplest)**
+**Method 3: Using Docker**
 
-<details>
-<summary>Docker Deployment Details</summary>
+Use the headless image for everyday automation. Choose the optional GUI image when you need to view the browser or briefly assist it.
 
-Using Docker deployment is the simplest method, requiring no development environment installation.
+| Deployment | Use case | Image tags |
+| --- | --- | --- |
+| Headless (default) | Everyday MCP automation with a smaller image | `latest`, `vX.Y.Z` |
+| GUI (optional, noVNC) | View login pages, troubleshoot, assist with input or select media | `novnc`, `vX.Y.Z-novnc` |
 
-**1. Pull Image from Docker Hub (Recommended)**
-
-We provide pre-built Docker images that can be directly pulled from Docker Hub:
-
-```bash
-# Pull the latest image
-docker pull xpzouying/xiaohongshu-mcp
-```
-
-Docker Hub URL: [https://hub.docker.com/r/xpzouying/xiaohongshu-mcp](https://hub.docker.com/r/xpzouying/xiaohongshu-mcp)
-
-**2. Start with Docker Compose (Recommended)**
-
-We provide a pre-configured `docker-compose.yml` file that can be used directly:
+Run one of the following from the project root:
 
 ```bash
-# Download docker-compose.yml
-wget https://raw.githubusercontent.com/xpzouying/xiaohongshu-mcp/main/docker/docker-compose.yml
-
-# Or if you've already cloned the project, enter the docker directory
-cd docker
-
-# Start service
-docker compose up -d
-
-# View logs
-docker compose logs -f
-
-# Stop service
-docker compose stop
+# Default headless deployment
+docker compose -f docker/docker-compose.yml up -d
 ```
-
-**3. Build Image Yourself (Optional)**
-
-If you need to customize or modify the code, you can build the image yourself:
 
 ```bash
-# Run in project root directory
-docker build -t xpzouying/xiaohongshu-mcp .
+# Optional GUI deployment
+docker compose -f docker/novnc/compose.yml up -d
 ```
 
-**4. Configuration Notes**
+For the GUI deployment, open the [browser desktop](http://127.0.0.1:6080/vnc.html?autoconnect=true&resize=scale). Both deployments use `http://127.0.0.1:18060/mcp` for MCP.
 
-The Docker version automatically:
+The desktop has no separate password. Access it locally or through SSH forwarding; **do not expose it directly to the internet**. Stop the existing instance before switching deployments.
 
-- Configures the built-in browser and Chinese fonts
-- Mounts `./data` for storing cookies and runtime data directories
-- Mounts `./images` for storing publish images
-- Exposes port 18060 for MCP connection
-
-For detailed instructions, please refer to: [Docker Deployment Guide](./docker/README.md)
-
-</details>
+For image registries, data directories and detailed steps, see the [Docker deployment guide](./docker/README.md) and [GUI deployment guide](./docker/novnc/README.md) (in Chinese).
 
 For Windows issues, check here first: [Windows Installation Guide](./docs/windows_guide.md)
 
@@ -1063,43 +1029,57 @@ Thanks to all friends who have contributed to this project! (In no particular or
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://haha.ai"><img src="https://avatars.githubusercontent.com/u/3946563?v=4?s=100" width="100px;" alt="zy"/><br /><sub><b>zy</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=xpzouying" title="Code">💻</a> <a href="#ideas-xpzouying" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=xpzouying" title="Documentation">📖</a> <a href="#design-xpzouying" title="Design">🎨</a> <a href="#maintenance-xpzouying" title="Maintenance">🚧</a> <a href="#infra-xpzouying" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/pulls?q=is%3Apr+reviewed-by%3Axpzouying" title="Reviewed Pull Requests">👀</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://www.hwbuluo.com"><img src="https://avatars.githubusercontent.com/u/1271815?v=4?s=100" width="100px;" alt="clearwater"/><br /><sub><b>clearwater</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=esperyong" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/laryzhong"><img src="https://avatars.githubusercontent.com/u/47939471?v=4?s=100" width="100px;" alt="Zhongpeng"/><br /><sub><b>Zhongpeng</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=laryzhong" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DTDucas"><img src="https://avatars.githubusercontent.com/u/105262836?v=4?s=100" width="100px;" alt="Duong Tran"/><br /><sub><b>Duong Tran</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=DTDucas" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Angiin"><img src="https://avatars.githubusercontent.com/u/17389304?v=4?s=100" width="100px;" alt="Angiin"/><br /><sub><b>Angiin</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Angiin" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/muhenan"><img src="https://avatars.githubusercontent.com/u/43441941?v=4?s=100" width="100px;" alt="Henan Mu"/><br /><sub><b>Henan Mu</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=muhenan" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/chengazhen"><img src="https://avatars.githubusercontent.com/u/52627267?v=4?s=100" width="100px;" alt="Journey"/><br /><sub><b>Journey</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=chengazhen" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://haha.ai"><img src="https://avatars.githubusercontent.com/u/3946563?v=4&size=100" width="100px" height="100px" alt="zy"/><br /><sub><b>zy</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=xpzouying" title="Code">💻</a> <a href="#ideas-xpzouying" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=xpzouying" title="Documentation">📖</a> <a href="#design-xpzouying" title="Design">🎨</a> <a href="#maintenance-xpzouying" title="Maintenance">🚧</a> <a href="#infra-xpzouying" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/pulls?q=is%3Apr+reviewed-by%3Axpzouying" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.hwbuluo.com"><img src="https://avatars.githubusercontent.com/u/1271815?v=4&size=100" width="100px" height="100px" alt="clearwater"/><br /><sub><b>clearwater</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=esperyong" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/laryzhong"><img src="https://avatars.githubusercontent.com/u/47939471?v=4&size=100" width="100px" height="100px" alt="Zhongpeng"/><br /><sub><b>Zhongpeng</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=laryzhong" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DTDucas"><img src="https://avatars.githubusercontent.com/u/105262836?v=4&size=100" width="100px" height="100px" alt="Duong Tran"/><br /><sub><b>Duong Tran</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=DTDucas" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Angiin"><img src="https://avatars.githubusercontent.com/u/17389304?v=4&size=100" width="100px" height="100px" alt="Angiin"/><br /><sub><b>Angiin</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Angiin" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/muhenan"><img src="https://avatars.githubusercontent.com/u/43441941?v=4&size=100" width="100px" height="100px" alt="Henan Mu"/><br /><sub><b>Henan Mu</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=muhenan" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/chengazhen"><img src="https://avatars.githubusercontent.com/u/52627267?v=4&size=100" width="100px" height="100px" alt="Journey"/><br /><sub><b>Journey</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=chengazhen" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/eveyuyi"><img src="https://avatars.githubusercontent.com/u/69026872?v=4?s=100" width="100px;" alt="Eve Yu"/><br /><sub><b>Eve Yu</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=eveyuyi" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/CooperGuo"><img src="https://avatars.githubusercontent.com/u/183056602?v=4?s=100" width="100px;" alt="CooperGuo"/><br /><sub><b>CooperGuo</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=CooperGuo" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://biboyqg.github.io/"><img src="https://avatars.githubusercontent.com/u/125724218?v=4?s=100" width="100px;" alt="Banghao Chi"/><br /><sub><b>Banghao Chi</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=BiboyQG" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/varz1"><img src="https://avatars.githubusercontent.com/u/60377372?v=4?s=100" width="100px;" alt="varz1"/><br /><sub><b>varz1</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=varz1" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://google.meloguan.site"><img src="https://avatars.githubusercontent.com/u/62586556?v=4?s=100" width="100px;" alt="Melo Y Guan"/><br /><sub><b>Melo Y Guan</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Meloyg" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lmxdawn"><img src="https://avatars.githubusercontent.com/u/21293193?v=4?s=100" width="100px;" alt="lmxdawn"/><br /><sub><b>lmxdawn</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=lmxdawn" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/haikow"><img src="https://avatars.githubusercontent.com/u/22428382?v=4?s=100" width="100px;" alt="haikow"/><br /><sub><b>haikow</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=haikow" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/eveyuyi"><img src="https://avatars.githubusercontent.com/u/69026872?v=4&size=100" width="100px" height="100px" alt="Eve Yu"/><br /><sub><b>Eve Yu</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=eveyuyi" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/CooperGuo"><img src="https://avatars.githubusercontent.com/u/183056602?v=4&size=100" width="100px" height="100px" alt="CooperGuo"/><br /><sub><b>CooperGuo</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=CooperGuo" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://biboyqg.github.io/"><img src="https://avatars.githubusercontent.com/u/125724218?v=4&size=100" width="100px" height="100px" alt="Banghao Chi"/><br /><sub><b>Banghao Chi</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=BiboyQG" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/varz1"><img src="https://avatars.githubusercontent.com/u/60377372?v=4&size=100" width="100px" height="100px" alt="varz1"/><br /><sub><b>varz1</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=varz1" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://google.meloguan.site"><img src="https://avatars.githubusercontent.com/u/62586556?v=4&size=100" width="100px" height="100px" alt="Melo Y Guan"/><br /><sub><b>Melo Y Guan</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Meloyg" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lmxdawn"><img src="https://avatars.githubusercontent.com/u/21293193?v=4&size=100" width="100px" height="100px" alt="lmxdawn"/><br /><sub><b>lmxdawn</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=lmxdawn" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/haikow"><img src="https://avatars.githubusercontent.com/u/22428382?v=4&size=100" width="100px" height="100px" alt="haikow"/><br /><sub><b>haikow</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=haikow" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://carlo-blog.aiju.fun/"><img src="https://avatars.githubusercontent.com/u/18513362?v=4?s=100" width="100px;" alt="Carlo"/><br /><sub><b>Carlo</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=a67793581" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/hrz394943230"><img src="https://avatars.githubusercontent.com/u/28583005?v=4?s=100" width="100px;" alt="hrz"/><br /><sub><b>hrz</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=hrz394943230" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ctrlz526"><img src="https://avatars.githubusercontent.com/u/143257420?v=4?s=100" width="100px;" alt="Ctrlz"/><br /><sub><b>Ctrlz</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=ctrlz526" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/flippancy"><img src="https://avatars.githubusercontent.com/u/6467703?v=4?s=100" width="100px;" alt="flippancy"/><br /><sub><b>flippancy</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=flippancy" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Infinityay"><img src="https://avatars.githubusercontent.com/u/103165980?v=4?s=100" width="100px;" alt="Yuhang Lu"/><br /><sub><b>Yuhang Lu</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Infinityay" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://triepod.ai"><img src="https://avatars.githubusercontent.com/u/199543909?v=4?s=100" width="100px;" alt="Bryan Thompson"/><br /><sub><b>Bryan Thompson</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=bryankthompson" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://www.megvii.com"><img src="https://avatars.githubusercontent.com/u/7806992?v=4?s=100" width="100px;" alt="tan jun"/><br /><sub><b>tan jun</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=tanxxjun321" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://carlo-blog.aiju.fun/"><img src="https://avatars.githubusercontent.com/u/18513362?v=4&size=100" width="100px" height="100px" alt="Carlo"/><br /><sub><b>Carlo</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=a67793581" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/hrz394943230"><img src="https://avatars.githubusercontent.com/u/28583005?v=4&size=100" width="100px" height="100px" alt="hrz"/><br /><sub><b>hrz</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=hrz394943230" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ctrlz526"><img src="https://avatars.githubusercontent.com/u/143257420?v=4&size=100" width="100px" height="100px" alt="Ctrlz"/><br /><sub><b>Ctrlz</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=ctrlz526" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/flippancy"><img src="https://avatars.githubusercontent.com/u/6467703?v=4&size=100" width="100px" height="100px" alt="flippancy"/><br /><sub><b>flippancy</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=flippancy" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Infinityay"><img src="https://avatars.githubusercontent.com/u/103165980?v=4&size=100" width="100px" height="100px" alt="Yuhang Lu"/><br /><sub><b>Yuhang Lu</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Infinityay" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://triepod.ai"><img src="https://avatars.githubusercontent.com/u/199543909?v=4&size=100" width="100px" height="100px" alt="Bryan Thompson"/><br /><sub><b>Bryan Thompson</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=bryankthompson" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.megvii.com"><img src="https://avatars.githubusercontent.com/u/7806992?v=4&size=100" width="100px" height="100px" alt="tan jun"/><br /><sub><b>tan jun</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=tanxxjun321" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/coldmountein"><img src="https://avatars.githubusercontent.com/u/95873096?v=4?s=100" width="100px;" alt="coldmountain"/><br /><sub><b>coldmountain</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=coldmountein" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://blog.litpp.com/"><img src="https://avatars.githubusercontent.com/u/44826388?v=4?s=100" width="100px;" alt="mamage"/><br /><sub><b>mamage</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=yqdaddy" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=yqdaddy" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://runyang.vercel.app/"><img src="https://avatars.githubusercontent.com/u/54588936?v=4?s=100" width="100px;" alt="Runyang YOU"/><br /><sub><b>Runyang YOU</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=YRYangang" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=YRYangang" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.hnfnu.edu.cn/"><img src="https://avatars.githubusercontent.com/u/134906805?v=4?s=100" width="100px;" alt="e0_7"/><br /><sub><b>e0_7</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Daily-AC" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Daily-AC" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/prehisle"><img src="https://avatars.githubusercontent.com/u/2081344?v=4?s=100" width="100px;" alt="prehisle"/><br /><sub><b>prehisle</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=prehisle" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=prehisle" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/blablabiu"><img src="https://avatars.githubusercontent.com/u/123888078?v=4?s=100" width="100px;" alt="Xinhao Chen"/><br /><sub><b>Xinhao Chen</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=blablabiu" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=blablabiu" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/qiuxsgit"><img src="https://avatars.githubusercontent.com/u/15036686?v=4?s=100" width="100px;" alt="qiuxsgit"/><br /><sub><b>qiuxsgit</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=qiuxsgit" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/coldmountein"><img src="https://avatars.githubusercontent.com/u/95873096?v=4&size=100" width="100px" height="100px" alt="coldmountain"/><br /><sub><b>coldmountain</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=coldmountein" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://blog.litpp.com/"><img src="https://avatars.githubusercontent.com/u/44826388?v=4&size=100" width="100px" height="100px" alt="mamage"/><br /><sub><b>mamage</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=yqdaddy" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=yqdaddy" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://runyang.vercel.app/"><img src="https://avatars.githubusercontent.com/u/54588936?v=4&size=100" width="100px" height="100px" alt="Runyang YOU"/><br /><sub><b>Runyang YOU</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=YRYangang" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=YRYangang" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.hnfnu.edu.cn/"><img src="https://avatars.githubusercontent.com/u/134906805?v=4&size=100" width="100px" height="100px" alt="e0_7"/><br /><sub><b>e0_7</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Daily-AC" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Daily-AC" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/prehisle"><img src="https://avatars.githubusercontent.com/u/2081344?v=4&size=100" width="100px" height="100px" alt="prehisle"/><br /><sub><b>prehisle</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=prehisle" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=prehisle" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/blablabiu"><img src="https://avatars.githubusercontent.com/u/123888078?v=4&size=100" width="100px" height="100px" alt="Xinhao Chen"/><br /><sub><b>Xinhao Chen</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=blablabiu" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=blablabiu" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/qiuxsgit"><img src="https://avatars.githubusercontent.com/u/15036686?v=4&size=100" width="100px" height="100px" alt="qiuxsgit"/><br /><sub><b>qiuxsgit</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=qiuxsgit" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZhuYichuan"><img src="https://avatars.githubusercontent.com/u/7954801?v=4?s=100" width="100px;" alt="openlts"/><br /><sub><b>openlts</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=ZhuYichuan" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZhuYichuan"><img src="https://avatars.githubusercontent.com/u/7954801?v=4&size=100" width="100px" height="100px" alt="openlts"/><br /><sub><b>openlts</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=ZhuYichuan" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/galois1983"><img src="https://avatars.githubusercontent.com/u/80469442?v=4&size=100" width="100px" height="100px" alt="galois1983"/><br /><sub><b>galois1983</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=galois1983" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/xPeiPeix"><img src="https://avatars.githubusercontent.com/u/42157266?v=4&size=100" width="100px" height="100px" alt="Peip"/><br /><sub><b>Peip</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=xPeiPeix" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/zhenzoo"><img src="https://avatars.githubusercontent.com/u/273501489?v=4&size=100" width="100px" height="100px" alt="zhenzoo"/><br /><sub><b>zhenzoo</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=zhenzoo" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/eeeggplant"><img src="https://avatars.githubusercontent.com/u/73321941?v=4&size=100" width="100px" height="100px" alt="eggplant"/><br /><sub><b>eggplant</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=eeeggplant" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Iams4kura"><img src="https://avatars.githubusercontent.com/u/126048986?v=4&size=100" width="100px" height="100px" alt="s4kura"/><br /><sub><b>s4kura</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Iams4kura" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Matrixqlc"><img src="https://avatars.githubusercontent.com/u/129405195?v=4&size=100" width="100px" height="100px" alt="Matrixqlc"/><br /><sub><b>Matrixqlc</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Matrixqlc" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.zhihu.com/people/lim0-34"><img src="https://avatars.githubusercontent.com/u/39004676?v=4&size=100" width="100px" height="100px" alt="Qu Yuli"/><br /><sub><b>Qu Yuli</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=DLLXW" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ao-lj-ao"><img src="https://avatars.githubusercontent.com/u/287673796?v=4&size=100" width="100px" height="100px" alt="ao-lj-ao"/><br /><sub><b>ao-lj-ao</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=ao-lj-ao" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/CNQQC"><img src="https://avatars.githubusercontent.com/u/243505512?v=4&size=100" width="100px" height="100px" alt="CNQQC"/><br /><sub><b>CNQQC</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=CNQQC" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ACCLE123"><img src="https://avatars.githubusercontent.com/u/95094975?v=4&size=100" width="100px" height="100px" alt="ACCLE123"/><br /><sub><b>ACCLE123</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=ACCLE123" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/SamYunquChen"><img src="https://avatars.githubusercontent.com/u/106165995?v=4&size=100" width="100px" height="100px" alt="SamYunquChen"/><br /><sub><b>SamYunquChen</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=SamYunquChen" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kalivid"><img src="https://avatars.githubusercontent.com/u/22721966?v=4&size=100" width="100px" height="100px" alt="kalivid"/><br /><sub><b>kalivid</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=kalivid" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
