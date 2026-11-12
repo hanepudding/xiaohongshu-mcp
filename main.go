@@ -48,6 +48,14 @@ func main() {
 
 	// 创建并启动应用服务器
 	appServer := NewAppServer(xiaohongshuService, token)
+	// 本 fork 只暴露检索类工具。registerTools 保持 upstream 原样，在入口摘掉其余工具，减少同步冲突。
+	// upstream 新增工具会默认暴露，同步时要核对这份名单。
+	appServer.mcpServer.RemoveTools(
+		"publish_content", "publish_with_video", "list_feeds",
+		"post_comment_to_feed", "reply_comment_in_feed",
+		"like_feed", "favorite_feed", "get_my_profile",
+		"get_unread_count", "list_notifications", "reply_notification", "like_notification",
+	)
 	if err := appServer.Start(port); err != nil {
 		logrus.Fatalf("failed to run server: %v", err)
 	}
