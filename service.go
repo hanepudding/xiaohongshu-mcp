@@ -193,11 +193,8 @@ func (s *XiaohongshuService) waitScanInBackground(
 		defer s.logins.finish(seq)
 
 		if loginAction.WaitForLogin(ctxTimeout) {
-			// The avatar element can be present while the page still reports
-			// a guest user; cookies saved at that point are a guest session.
-			// Save only once the page's own user state is non-guest.
-			if !waitAuthenticated(ctxTimeout, loginAction, page) {
-				logrus.Warnf("检测到扫码但会话仍为访客态，未保存 cookies，会话 #%d", seq)
+			if err := waitAuthenticated(ctxTimeout, loginAction, page); err != nil {
+				logrus.Warnf("确认登录会话失败，未保存 cookies，会话 #%d: %v", seq, err)
 				return
 			}
 			if err := saveCookies(page); err != nil {
@@ -213,33 +210,30 @@ func (s *XiaohongshuService) waitScanInBackground(
 	}()
 }
 
-// waitAuthenticated re-navigates and polls the page's own user state until it
-// reports a non-guest user, so the authenticated web_session is in the cookie
-// store before we save it. Returns false if the session stays guest until the
-// context ends.
-func waitAuthenticated(ctx context.Context, loginAction *xiaohongshu.LoginAction, page *rod.Page) bool {
+// waitAuthenticated 刷新 explore 确认认证会话，避免保存扫码前的访客 cookies。
+func waitAuthenticated(ctx context.Context, loginAction *xiaohongshu.LoginAction, page *rod.Page) error {
 	for {
 		select {
 		case <-ctx.Done():
-			return false
+			return ctx.Err()
 		default:
 		}
 
 		pp := page.Context(ctx)
-		if err := rod.Try(func() {
-			pp.MustNavigate(xiaohongshu.BaseURL() + "/explore").MustWaitLoad()
-		}); err != nil {
-			return false
+		if err := pp.Navigate(xiaohongshu.BaseURL() + "/explore"); err != nil {
+			return err
 		}
 		time.Sleep(2 * time.Second)
 
 		if _, err := loginAction.CurrentUser(ctx); err == nil {
-			return true
+			return nil
+		} else if !errors.Is(err, xhserrors.ErrNotLoggedIn) && !(errors.Is(err, context.DeadlineExceeded) && ctx.Err() == nil) {
+			return err
 		}
 
 		select {
 		case <-ctx.Done():
-			return false
+			return ctx.Err()
 		case <-time.After(2 * time.Second):
 		}
 	}
@@ -453,7 +447,7 @@ func (s *XiaohongshuService) SearchFeeds(ctx context.Context, keyword string, fi
 	// 未登录时页面弹登录框、不出结果：表现为等待超时或空结果，这里换成真正的原因。
 	if err != nil || len(feeds) == 0 {
 		if _, uerr := xiaohongshu.NewLogin(page).CurrentUser(ctx); uerr != nil {
-			return nil, xhserrors.ErrNotLoggedIn
+			return nil, uerr
 		}
 	}
 	if err != nil {
@@ -485,7 +479,7 @@ func (s *XiaohongshuService) GetFeedDetailWithConfig(ctx context.Context, feedID
 
 	result, err := action.GetFeedDetailWithConfig(ctx, feedID, xsecToken, loadAllComments, config)
 	if err != nil {
-		if _, uerr := xiaohongshu.NewLogin(page).CurrentUser(ctx); uerr != nil {
+		if _, uerr := xiaohongshu.NewLogin(page).CurrentUser(ctx); errors.Is(uerr, xhserrors.ErrNotLoggedIn) {
 			return nil, xhserrors.ErrNotLoggedIn
 		}
 		return nil, err
