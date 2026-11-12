@@ -105,12 +105,9 @@ func (f *FeedDetailAction) GetFeedDetailWithConfig(ctx context.Context, feedID, 
 	logrus.Infof("配置: 点击更多=%v, 回复阈值=%d, 最大评论数=%d, 滚动速度=%s",
 		config.ClickMoreReplies, config.MaxRepliesThreshold, config.MaxCommentItems, config.ScrollSpeed)
 
-	// 使用retry-go处理页面导航和DOM稳定等待
 	err := retry.Do(
 		func() error {
-			page.MustNavigate(url)
-			waitFeedPageReady(page)
-			return nil
+			return page.Navigate(url)
 		},
 		retry.Attempts(3),
 		retry.Delay(500*time.Millisecond),
@@ -122,6 +119,29 @@ func (f *FeedDetailAction) GetFeedDetailWithConfig(ctx context.Context, feedID, 
 	if err != nil {
 		logrus.Errorf("页面导航失败: %v", err)
 		return nil, err
+	}
+	// 正文与首批评论分别返回；空列表且 hasMore=true 仍可能是占位状态。
+	if err := page.Timeout(60 * time.Second).Wait(rod.Eval(`(feedID) => {
+		const detail = window.__INITIAL_STATE__?.note?.noteDetailMap?.[feedID];
+		const note = detail?.note;
+		const comments = detail?.comments;
+		const count = note?.interactInfo?.commentCount;
+		const zeroComments = (typeof count === "number" || (typeof count === "string" && count.trim() !== "")) && Number(count) === 0;
+		const commentsReady = Array.isArray(comments?.list) &&
+			(comments.list.length > 0 || comments.hasMore === false || zeroComments);
+		const raw = window.__INITIAL_STATE__?.user?.userInfo;
+		const user = raw?.value !== undefined ? raw.value : raw;
+		return user?.guest === true || (note?.noteId === feedID && commentsReady) ||
+			Boolean(document.querySelector(".access-wrapper, .error-wrapper, .not-found-wrapper, .blocked-wrapper")?.textContent.trim());
+	}`, feedID)); err != nil {
+		return nil, fmt.Errorf("waiting for feed %s data: %w", feedID, err)
+	}
+	state, err := NewLogin(page).readCurrentUserState(page.GetContext())
+	if err != nil {
+		return nil, err
+	}
+	if state.Guest != nil && *state.Guest {
+		return nil, errors.ErrNotLoggedIn
 	}
 	humanize.Delay(ctx, humanize.AfterNavigate)
 
@@ -990,8 +1010,8 @@ func (f *FeedDetailAction) extractFeedDetail(page *rod.Page, feedID string) (*Fe
 	}
 
 	noteDetail, exists := noteDetailMap[feedID]
-	if !exists {
-		return nil, fmt.Errorf("feed %s not found in noteDetailMap", feedID)
+	if !exists || noteDetail.Note.NoteID != feedID {
+		return nil, fmt.Errorf("feed %s data not ready in noteDetailMap", feedID)
 	}
 
 	return &FeedDetailResponse{
