@@ -737,4 +737,3 @@ func (s *XiaohongshuService) GetMyProfile(ctx context.Context, tab string) (*Use
 
 	return response, nil
 }
-
